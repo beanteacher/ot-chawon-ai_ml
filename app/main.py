@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from app.services.size_rule import predict_size
 
-app = FastAPI(title="ot-chawon-size-api", version="0.2.0")
+app = FastAPI(title="ot-chawon-size-api", version="0.3.0")
 
 
 class SizePredictRequest(BaseModel):
@@ -28,8 +28,9 @@ def health() -> dict[str, str]:
 
 @app.post('/size/predict', response_model=SizePredictResponse)
 def size_predict(payload: SizePredictRequest) -> SizePredictResponse:
+    size, reasons = predict_size(payload.height_cm, payload.weight_kg, payload.gender)
     return SizePredictResponse(
-        recommended_size=predict_size(payload.height_cm),
-        confidence=0.6,
-        reason=['rule-based baseline v0']
+        recommended_size=size,
+        confidence=0.7,
+        reason=reasons,
     )
